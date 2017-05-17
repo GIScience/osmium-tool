@@ -149,6 +149,11 @@ namespace {
 
 } // anonymous namespace
 
+bool typeidversion_comparator(const osmium::OSMObject& lhs, const osmium::OSMObject& rhs) {
+    return const_tie(lhs.type(), lhs.id(), lhs.version()) <
+           const_tie(rhs.type(), rhs.id(), rhs.version());
+}
+
 bool CommandMerge::run() {
     m_vout << "Opening output file...\n";
     osmium::io::Header header;
@@ -173,7 +178,8 @@ bool CommandMerge::run() {
 
         std::set_union(in1.cbegin(), in1.cend(),
                        in2.cbegin(), in2.cend(),
-                       out);
+                       out,
+                       typeidversion_comparator);
     } else {
         // Three or more files to merge
         m_vout << "Merging " << m_input_files.size() << " input files to output file...\n";
